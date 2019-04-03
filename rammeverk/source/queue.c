@@ -28,28 +28,23 @@ void remove_from_queue(int floor){
 	up_queue[floor]=down_queue[floor]=0;
 }
 
-int queue_direction(int floor, int motor_dir){
-	if (motor_dir==1){
-		return up_queue[floor];
-	}
-	else if (motor_dir==-1){
-		return down_queue[floor];
-	}
-	return 0;
-
-}
-
-int get_order_from_queue(int floor, int motor_dir){
+int is_queue_empty(){
 	int i;
-	int order;
-	for (i = floor; (i>-1) && (i<4); i+=motor_dir){
-		if(queue_direction(i,motor_dir)==1){
-			order=1;
-			break;
-		}
-		else{
-			order=0;
+	int nr_order = 0;
+	int temp;
+	for(i=0; i<4;i++){
+		if((up_queue[i]||down_queue[i])==1){
+			nr_order++;
+			temp=i;
 		}
 	}
-	return order;
+	if(nr_order==1){//Kun en bestilling i heisen
+ 		return temp;
+	}
+	else if (nr_order>1){
+ 		return -2;
+	}
+	else{
+		return -1;
+	}
 }

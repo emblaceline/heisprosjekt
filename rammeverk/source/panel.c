@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include "door.h"
 
-static int motor_dir = DIRN_UP;
-
-bool doorIsOpen;
 
 void check_all_button(){
 	for (int floor=0; floor<N_FLOORS; floor++) {
@@ -30,29 +27,46 @@ void check_all_button(){
 	}
 }
 
-void emergency(){  //slette bestillinger osv..
+void emergency(){  
 	elev_set_motor_direction(DIRN_STOP);
 	elev_set_stop_lamp(1);
+	turn_off_all_lights();
+
+	for(int floor = 0; floor<N_FLOORS; floor++){ //sletter bestillinger 
+		remove_from_queue(floor);
+	}
+
+	printf("start\n");
 	if(elev_get_floor_sensor_signal>=0){
 		while(elev_get_stop_signal()){
 			open_door();
 		}
 	}
 	elev_set_stop_lamp(0);
+	printf("stopp\n");
 }
 
 
-void drive(int current_floor, int current_direction){
-	if(get_order_from_queue(current_floor, motor_dir) == 1){
-		elev_set_motor_direction(motor_dir);
+
+void turn_off_all_lights(){
+	for(int floor = 0; floor < N_FLOORS; floor ++){
+		elev_set_button_lamp(BUTTON_COMMAND,floor,0);
 	}
-	else if (get_order_from_queue(current_floor, -current_direction) == 1){
-		motor_dir=-current_direction;
+	for(int floor = 0; floor < N_FLOORS-1; floor++){
+		elev_set_button_lamp(BUTTON_CALL_UP,floor,0);
+		elev_set_button_lamp(BUTTON_CALL_DOWN,floor+1,0);
+
 	}
-	else{
-		motor_dir=0;
-	}
+
 }
+
+bool correct_floor(int floor){
+    if(elev_get_floor_sensor_signal() == floor) {
+        return true;
+    }
+    return false;
+}
+
 
 
 

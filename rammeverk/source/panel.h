@@ -1,6 +1,6 @@
 
 void check_all_button();
 void emergency();
-
-void drive(int current_floor, int current_direction);
+void turn_off_all_lights();
+bool correct_floor(int floor);
 

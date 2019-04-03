@@ -4,9 +4,10 @@
 #include "door.h"
 
 bool doorIsOpen;
+int lastFloor;
+int lastDir;
 
 void start_up();
-bool correct_floor(int floor);
 
 int main() {
     // Initialize hardware
@@ -19,12 +20,16 @@ int main() {
 
     //elev_set_motor_direction(DIRN_UP);
 
-    bool doorIsOpen = false;
+    doorIsOpen = false;
 
     start_up();
-    int floor = 0;
+    int floor = N_FLOORS; //utenfor etasjesignalene
     
     while(1){
+
+        if(elev_get_floor_sensor_signal() >= 0){
+            lastFloor = elev_get_floor_sensor_signal();
+        }
 
         while(elev_get_stop_signal()==0){
             check_all_button();
@@ -41,39 +46,15 @@ int main() {
             }
         }
 
-        if(elev_get_floor_sensor_signal() == 1){
+        if(elev_get_floor_sensor_signal() >=0 ){
             emergency();
+            printf("out\n");
             //for (floor = 0; floor < N_FLOORS; floor++){
                 //remove_from_queue(floor);
             //}
         }
         
     }
-
-    
-  
-    /*while (1) {
-
-       // Change direction when we reach top/bottom floor
-        if (elev_get_floor_sensor_signal() == N_FLOORS - 1) {
-            elev_set_motor_direction(DIRN_DOWN);
-        } else if (elev_get_floor_sensor_signal() == 0) {
-            elev_set_motor_direction(DIRN_UP);
-        }
-
-        
-        check_all_button();
-        drive(1,1);
-        
-
-
-        // Stop elevator and exit program if the stop button is pressed
-        if (elev_get_stop_signal()) {
-            elev_set_motor_direction(DIRN_STOP);
-            break;
-        }
-    }
-    */
     
     return 0;
 }
@@ -92,11 +73,4 @@ void start_up() {
         }
     }
     elev_set_floor_indicator(elev_get_floor_sensor_signal());
-}
-
-bool correct_floor(int floor){
-    if(elev_get_floor_sensor_signal() == floor) {
-        return true;
-    }
-    return false;
 }

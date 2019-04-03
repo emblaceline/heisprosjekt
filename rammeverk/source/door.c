@@ -3,7 +3,6 @@
 #include <time.h>
 #include <stdio.h>
 
-bool doorIsOpen;
 
 int doorStatus = 0; //0 om døren er igjen, >0 om døren er åpen
 
@@ -11,7 +10,6 @@ void open_door() {
 	doorStatus = set_timer(WAIT_TIME);
 	elev_set_door_open_lamp(1);
 	doorIsOpen=true;
-
 }
 
 
