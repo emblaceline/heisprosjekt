@@ -6,27 +6,28 @@
 
 int doorStatus = 0; //0 om døren er igjen, >0 om døren er åpen
 
-void open_door() {
-	doorStatus = set_timer(WAIT_TIME);
+void door_open_door() {
+	doorStatus = door_set_timer(WAIT_TIME);
 	elev_set_door_open_lamp(1);
 	doorIsOpen=true;
 }
 
 
-void close_door() {
-	if (check_time(doorStatus)) {
+void door_close_door() {
+	if (door_check_time(doorStatus)) {
 		elev_set_door_open_lamp(0);
 		doorStatus = 0;
 		doorIsOpen=false;
+		printf("dør lukket \n");
 	}
 }
 
-int set_timer(int waitTime) {
+int door_set_timer(int waitTime) {
 	return time(NULL) + waitTime;
 
 }
 
-int check_time(int doorStatus) {
+int door_check_time(int doorStatus) {
 	if (doorStatus <= time(NULL)) {
 		return 1;
 	}

@@ -5,7 +5,7 @@
 #include "door.h"
 
 
-void check_all_button(){
+void panel_check_all_button(){
 	for (int floor=0; floor<N_FLOORS; floor++) {
 		if (elev_get_button_signal(BUTTON_COMMAND,floor)) {
 			set_queue_command(floor, elev_get_floor_sensor_signal());
@@ -27,28 +27,24 @@ void check_all_button(){
 	}
 }
 
-void emergency(){  
+void panel_emergency(){  
 	elev_set_motor_direction(DIRN_STOP);
 	elev_set_stop_lamp(1);
-	turn_off_all_lights();
+	panel_turn_off_all_lights();
 
-	for(int floor = 0; floor<N_FLOORS; floor++){ //sletter bestillinger 
-		remove_from_queue(floor);
-	}
-
-	printf("start\n");
+	printf("dør åpnet\n");
 	if(elev_get_floor_sensor_signal>=0){
 		while(elev_get_stop_signal()){
-			open_door();
+			door_open_door();
 		}
 	}
 	elev_set_stop_lamp(0);
-	printf("stopp\n");
+	printf("stopp sluppet\n");
 }
 
 
 
-void turn_off_all_lights(){
+void panel_turn_off_all_lights(){
 	for(int floor = 0; floor < N_FLOORS; floor ++){
 		elev_set_button_lamp(BUTTON_COMMAND,floor,0);
 	}
@@ -60,13 +56,13 @@ void turn_off_all_lights(){
 
 }
 
-bool correct_floor(int floor){
+
+_Bool panel_correct_floor(int floor){
     if(elev_get_floor_sensor_signal() == floor) {
         return true;
     }
     return false;
 }
-
 
 
 

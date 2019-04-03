@@ -1,6 +1,35 @@
+/**
+* @file
+* @brief Library to check for orders, 
+* handle stop-button functions and driving the elevator
+*/
 
-void check_all_button();
-void emergency();
-void turn_off_all_lights();
-bool correct_floor(int floor);
+
+/**
+* @brief Checks if any order buttons are pressed, and turns on light and adds them to the order queue
+* if they are.
+*/
+void panel_check_all_button();
+
+
+/**
+* @brief Stops the elevator, stop button is on while pressed. If elevator is on a floor the door is opened while 
+* stop button is pressed and three sec after it is released. Turns off all order buttons.
+*/
+void panel_emergency();
+
+
+/**
+* @brief Turns of all order buttons.
+*/
+void panel_turn_off_all_lights();
+
+/**
+* @brief Checks if the floor we are on is the same as the wanted floor from the order.
+*
+* @param floor The floor of the order
+*
+* @return true if elevator is on correct floor, if not false.
+*/
+_Bool panel_correct_floor(int floor);
 

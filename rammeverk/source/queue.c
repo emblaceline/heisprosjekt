@@ -1,5 +1,6 @@
 #include "queue.h"
 #include <stdio.h>
+#include "elev.h"
 
 static int up_queue[4]={0};
 static int down_queue[4]={0};
@@ -46,5 +47,11 @@ int is_queue_empty(){
 	}
 	else{
 		return -1;
+	}
+}
+
+void queue_remove_all_orders(){
+	for(int floor = 0; floor<N_FLOORS; floor++){ //sletter bestillinger 
+		remove_from_queue(floor);
 	}
 }
