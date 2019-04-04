@@ -5,22 +5,22 @@
 #include "door.h"
 
 
-void panel_check_all_button(){
+void panel_check_all_button(int lastFloor){
 	for (int floor=0; floor<N_FLOORS; floor++) {
 		if (elev_get_button_signal(BUTTON_COMMAND,floor)) {
-			set_queue_command(floor, elev_get_floor_sensor_signal());
+			set_queue(floor, lastFloor);
 			elev_set_button_lamp(BUTTON_COMMAND,floor,1);
 		}
 
 		if (floor!=N_FLOORS-1) {
 			if (elev_get_button_signal(BUTTON_CALL_UP, floor)==1){
-				set_queue_up(floor);
+				set_queue(floor, lastFloor);
 				elev_set_button_lamp(BUTTON_CALL_UP, floor, 1);
 			}
 		}
 		if (floor != 0) {
 			if (elev_get_button_signal(BUTTON_CALL_DOWN, floor)==1){
-				set_queue_down(floor);
+				set_queue(floor, lastFloor);
 				elev_set_button_lamp(BUTTON_CALL_DOWN, floor, 1);
 			}
 		}
@@ -77,21 +77,21 @@ int panel_compare(int order, int last_floor){
 }
 
 
-/*void panel_drive(int last_floor){
-	bool driving = false;
-	int order = get_next_order();
-	int motor_dir = panel_compare(order,last_floor);
-	elev_set_motor_direction(motor_dir);
-	if (motor_dir!=0){
-		driving=true;
-		while(driving){
-			if(panel_correct_floor(order)==1){
-				elev_set_motor_direction(DIRN_STOP);
-				driving=false;
-			}
-		}
-	}
-}*/
+void drive(int lastFloor){
+    if(get_next_order(lastFloor)!=-2){
+        int motor_dir;
+        int order;
+        order=get_next_order(lastFloor);
+        printf("order: ");
+        printf("%i\n", order);
+        motor_dir = panel_compare(order,lastFloor);
+        elev_set_motor_direction(motor_dir);
+        if(lastFloor==order){
+        	elev_set_motor_direction(DIRN_STOP);
+        	remove_from_queue(order);
+        }
+    }   
+}
 
 
 

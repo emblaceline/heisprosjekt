@@ -9,7 +9,7 @@
 * @brief Checks if any order buttons are pressed, and turns on light and adds them to the order queue
 * if they are.
 */
-void panel_check_all_button();
+void panel_check_all_button(int last_floor);
 
 
 /**
@@ -35,3 +35,4 @@ _Bool panel_correct_floor(int floor);
 
 //void panel_drive(int last_floor);
 int panel_compare(int order, int last_floor);
+void drive(int lastFloor);
