@@ -35,7 +35,7 @@ void panel_emergency(){
 	printf("dør åpnet\n");
 	if(elev_get_floor_sensor_signal>=0){
 		while(elev_get_stop_signal()){
-			door_open_door();
+			//door_open_door();
 		}
 	}
 	elev_set_stop_lamp(0);
@@ -64,8 +64,34 @@ _Bool panel_correct_floor(int floor){
     return false;
 }
 
+int panel_compare(int order, int last_floor){
+	if(last_floor<order){
+		return 1;
+	}
+	else if (last_floor>order){
+		return -1;
+	}
+	else{
+		return 0;
+	}
+}
 
 
+/*void panel_drive(int last_floor){
+	bool driving = false;
+	int order = get_next_order();
+	int motor_dir = panel_compare(order,last_floor);
+	elev_set_motor_direction(motor_dir);
+	if (motor_dir!=0){
+		driving=true;
+		while(driving){
+			if(panel_correct_floor(order)==1){
+				elev_set_motor_direction(DIRN_STOP);
+				driving=false;
+			}
+		}
+	}
+}*/
 
 
 

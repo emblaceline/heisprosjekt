@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "elev.h"
 
-static int up_queue[4]={0};
+static int up_queue[4]={0,0,0,0};
 static int down_queue[4]={0};
 
 void set_queue_command(int floor, int position){
@@ -29,29 +29,34 @@ void remove_from_queue(int floor){
 	up_queue[floor]=down_queue[floor]=0;
 }
 
-int is_queue_empty(){
-	int i;
+int nr_of_orders(){
 	int nr_order = 0;
-	int temp;
-	for(i=0; i<4;i++){
+	for(int i = 0; i<N_FLOORS; i++){
 		if((up_queue[i]||down_queue[i])==1){
 			nr_order++;
-			temp=i;
 		}
 	}
-	if(nr_order==1){//Kun en bestilling i heisen
- 		return temp;
-	}
-	else if (nr_order>1){
- 		return -2;
-	}
-	else{
-		return -1;
-	}
+	return nr_order;
 }
 
+int get_next_order(){
+	if(nr_of_orders()==0){
+		return -1;
+	}
+	else if(nr_of_orders()==1){
+		for (int i = 0; i < N_FLOORS; ++i)
+		{
+			if((up_queue[i]||down_queue[i])==1){
+				return i;
+			}
+		}
+	}
+	return 100;
+}
+
+
 void queue_remove_all_orders(){
-	for(int floor = 0; floor<N_FLOORS; floor++){ //sletter bestillinger 
+	for(int floor = 0; floor<N_FLOORS; floor++){  
 		remove_from_queue(floor);
 	}
 }

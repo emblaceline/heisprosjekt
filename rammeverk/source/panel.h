@@ -33,3 +33,5 @@ void panel_turn_off_all_lights();
 */
 _Bool panel_correct_floor(int floor);
 
+//void panel_drive(int last_floor);
+int panel_compare(int order, int last_floor);

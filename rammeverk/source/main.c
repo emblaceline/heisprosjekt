@@ -23,6 +23,7 @@ int main() {
     doorIsOpen = false;
 
     start_up();
+    printf("been her\n");
     int floor = N_FLOORS; 
     
     while(1){
@@ -31,19 +32,33 @@ int main() {
             lastFloor = elev_get_floor_sensor_signal();
         }
 
+        if(elev_get_stop_signal()){
+            elev_set_motor_direction(DIRN_STOP);
+            break;
+        }
+
         while(elev_get_stop_signal()==0){
+            
             panel_check_all_button();
+            
+            if(get_next_order()!=-1){
+                int temp;
+                temp=panel_compare(get_next_order(),lastFloor);
+                printf("%i\n", temp);
+            }
 
             //kode for å legge inn i kø og shit her ?
 
+            
+
             if (panel_correct_floor(floor) && (!doorIsOpen)){ 
                 elev_set_motor_direction(DIRN_STOP);
-                door_open_door();
+                //door_open_door();
             }
             
 
             if(doorIsOpen){
-                door_close_door();
+                //door_close_door();
             }
         }
 
@@ -71,4 +86,5 @@ void start_up() {
         }
     }
     elev_set_floor_indicator(elev_get_floor_sensor_signal());
+    lastFloor = elev_get_floor_sensor_signal();
 }
