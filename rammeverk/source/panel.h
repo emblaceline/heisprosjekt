@@ -20,7 +20,7 @@ void panel_emergency();
 
 
 /**
-* @brief Turns of all order buttons.
+* @brief Turns off all order buttons.
 */
 void panel_turn_off_all_lights();
 
@@ -36,3 +36,10 @@ _Bool panel_correct_floor(int floor);
 //void panel_drive(int last_floor);
 int panel_compare(int order, int last_floor);
 void drive(int lastFloor);
+
+/**
+* @brief Turns off call-up, call-down and command button on a floor.
+*
+* @param order Which floor to turn off the lights on.
+*/
+void panel_turn_off_light(int order);

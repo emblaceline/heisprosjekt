@@ -4,9 +4,8 @@
 #include "door.h"
 #include "queue.h"
 
-bool doorIsOpen;
 int lastFloor;
-int lastDir;
+
 
 void start_up();
 
@@ -21,17 +20,15 @@ int main() {
     printf("Press STOP button to stop elevator and exit program.\n");
 
 
-    doorIsOpen = false;
-
     start_up();
-    printf("been her\n");
+    printf("been here\n");
     int floor = N_FLOORS; 
     
     while(1){
 
-        //if(elev_get_floor_sensor_signal() >= 0){ // brukes for å huske hvor heisen er ved stopp.
-            //lastFloor = elev_get_floor_sensor_signal();
-        //}
+        if(elev_get_floor_sensor_signal() != -1){ // brukes for å huske hvor heisen er ved stopp.
+            lastFloor = elev_get_floor_sensor_signal();
+        }
 
         
         
@@ -40,17 +37,13 @@ int main() {
 
             if(elev_get_floor_sensor_signal() >= 0){ // brukes for å huske hvor heisen er ved stopp.
                 lastFloor = elev_get_floor_sensor_signal();
+                if (lastFloor!=-1)
+                    elev_set_floor_indicator(lastFloor);
             }
 
-            printf("last floor: ");
-            printf("%i\n", lastFloor);
+            
             panel_check_all_button(lastFloor);
-            //drive(lastFloor);
-            print_queue();
-            /*int temp;
-            temp=get_next_order(lastFloor);
-            printf("next order: ");
-            printf("%i\n", temp);*/
+            drive(lastFloor);
             
 
             if(elev_get_stop_signal()){
@@ -58,27 +51,24 @@ int main() {
                 break;
             }   
 
-            
-
-            //kode for å legge inn i kø og shit her ?
-
-            
-
-            if (panel_correct_floor(floor) && (!doorIsOpen)){ 
+            if(elev_get_floor_sensor_signal()==0 || elev_get_floor_sensor_signal()==3){
                 elev_set_motor_direction(DIRN_STOP);
-                //door_open_door();
+            }
+
+            if (panel_correct_floor(floor) && (!door_get_door_open())){ 
+                elev_set_motor_direction(DIRN_STOP);
+                door_open_door();
             }
             
 
-            if(doorIsOpen){
-                //door_close_door();
+            if(door_get_door_open()){
+                door_close_door();
             }
         }
 
-        if(elev_get_floor_sensor_signal() >=0 ){
-            panel_emergency();
-            queue_remove_all_orders();
-        }
+        panel_emergency();
+        queue_remove_all_orders();
+        
         
     }
     

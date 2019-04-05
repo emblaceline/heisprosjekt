@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdio.h>
 
-
+bool doorIsOpen;
 int doorStatus = 0; //0 om døren er igjen, >0 om døren er åpen
 
 void door_open_door() {
@@ -18,7 +18,6 @@ void door_close_door() {
 		elev_set_door_open_lamp(0);
 		doorStatus = 0;
 		doorIsOpen=false;
-		printf("dør lukket \n");
 	}
 }
 
@@ -32,4 +31,8 @@ int door_check_time(int doorStatus) {
 		return 1;
 	}
 	return 0;
+}
+
+_Bool door_get_door_open(){
+	return doorIsOpen;
 }

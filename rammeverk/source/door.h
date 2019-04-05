@@ -9,7 +9,6 @@ typedef int bool;
 
 #define WAIT_TIME 3
 
-extern bool doorIsOpen;
 
 /**
 * @brief Sets the timestamp to a given wait-time in the future, turns on the "door open"-light 
@@ -43,3 +42,5 @@ int door_set_timer(int waitTime);
 * @return 0 if the time is not up, 1 if the timer is done.
 */
 int door_check_time(int doorStatus);
+
+_Bool door_get_door_open();
