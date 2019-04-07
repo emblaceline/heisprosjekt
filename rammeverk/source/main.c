@@ -26,7 +26,7 @@ int main() {
     
     while(1){
 
-        if(elev_get_floor_sensor_signal() != -1){ // brukes for å huske hvor heisen er ved stopp.
+        if(elev_get_floor_sensor_signal() != -1){ 
             lastFloor = elev_get_floor_sensor_signal();
         }
 
@@ -35,7 +35,7 @@ int main() {
 
         while(elev_get_stop_signal()==0){
 
-            if(elev_get_floor_sensor_signal() >= 0){ // brukes for å huske hvor heisen er ved stopp.
+            if(elev_get_floor_sensor_signal() >= 0){ 
                 lastFloor = elev_get_floor_sensor_signal();
                 if (lastFloor!=-1)
                     elev_set_floor_indicator(lastFloor);
@@ -50,10 +50,6 @@ int main() {
                 elev_set_motor_direction(DIRN_STOP);
                 break;
             }   
-
-            if(elev_get_floor_sensor_signal()==0 || elev_get_floor_sensor_signal()==3){
-                elev_set_motor_direction(DIRN_STOP);
-            }
 
             if (panel_correct_floor(floor) && (!door_get_door_open())){ 
                 elev_set_motor_direction(DIRN_STOP);

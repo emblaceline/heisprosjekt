@@ -4,25 +4,24 @@
 #include <stdio.h>
 #include "door.h"
 
-int motorDirection;
+int motor_dir = 0;
 
 void panel_check_all_button(int lastFloor){
 	for (int floor=0; floor<N_FLOORS; floor++) {
 		if (elev_get_button_signal(BUTTON_COMMAND,floor)) {
-			set_queue(floor, lastFloor);
-			elev_set_button_lamp(BUTTON_COMMAND,floor,1);
+			set_queue(floor, lastFloor, motor_dir);
 		}
 
 		if (floor!=N_FLOORS-1) {
 
 			if (elev_get_button_signal(BUTTON_CALL_UP, floor)==1){
-				set_up_queue(floor);
+				set_up_queue(floor,motor_dir);
 				elev_set_button_lamp(BUTTON_CALL_UP, floor, 1);
 			}
 		}
 		if (floor != 0) {
 			if (elev_get_button_signal(BUTTON_CALL_DOWN, floor)==1){
-				set_down_queue(floor);
+				set_down_queue(floor,motor_dir);
 				elev_set_button_lamp(BUTTON_CALL_DOWN, floor, 1);
 			}
 		}
@@ -88,15 +87,30 @@ int panel_compare(int order, int last_floor){
 
 
 void drive(int lastFloor){
-    if(get_next_order(lastFloor)!=-2 && door_get_door_open()==0){
-        int motor_dir;
-        int order;
-        int currentFloor;
-        order=get_next_order(lastFloor);
+	int order = -2;
+	print_queue();
+	if(motor_dir==0){
+		order=get_next_order_up(lastFloor);
+		if(order==-2){
+			order=get_next_order_down(lastFloor);
+		}
+	}
+	else if(motor_dir==1){ 
+		order=get_next_order_up(lastFloor);
+		if(order==-2){
+			order=get_next_order_down(lastFloor);
+		}
+	}
+	else if(motor_dir==-1){ 
+		order=get_next_order_down(lastFloor);
+		if(order==-2){
+			order=get_next_order_up(lastFloor);
+		}
+	}
+	if(order!=-2 && door_get_door_open()==0){
         motor_dir = panel_compare(order,lastFloor);
         elev_set_motor_direction(motor_dir);
-        currentFloor=elev_get_floor_sensor_signal();
-        if(lastFloor==order ){
+        if(lastFloor==order){
         	door_open_door();
         	remove_from_queue(order);
         	panel_turn_off_light(order);
@@ -105,18 +119,6 @@ void drive(int lastFloor){
     }
 }
 
-int panel_button_pushed(int floor){
-	if(elev_get_button_signal(BUTTON_COMMAND,floor)){
-		return 1;
-	}
-	else if(elev_get_button_signal(BUTTON_CALL_DOWN,floor)){
-		return 1;
-	}
-	else if(elev_get_button_signal(BUTTON_CALL_UP,floor)){
-		return 1;
-	}
-	return 0;
-}
 
 
 

@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 bool doorIsOpen;
-int doorStatus = 0; //0 om døren er igjen, >0 om døren er åpen
+int doorStatus = 0; 
 
 void door_open_door() {
 	doorStatus = door_set_timer(WAIT_TIME);

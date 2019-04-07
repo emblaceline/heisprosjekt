@@ -11,7 +11,7 @@
 *
 * @param lastFloor The last floor the elevator was registered at.
 */
-void set_queue(int order, int lastFloor);
+void set_queue(int order, int lastFloor, int motor_dir);
 
 /**
 * @brief Removes an order from queue.
@@ -34,7 +34,7 @@ int queue_empty();
 *
 * @return Returns the floor of the next order. Returns -2 if there are no orders.
 */
-int get_next_order(int lastFloor);
+int get_next_order_down(int lastFloor);
 
 /**
 * @brief Removes all orders in queue.
@@ -46,12 +46,18 @@ void queue_remove_all_orders();
 *
 * @param order The floor of the order.
 */
-void set_up_queue(int order);
+void set_up_queue(int order, int motor_dir);
 
 /**
 * @brief Puts an order on the correct floor for a down-button.
 *
 * @param order The floor of the order.
 */
-void set_down_queue(int order);
+void set_down_queue(int order, int motor_dir);
+
+int get_next_order_up(int lastFloor);
+
+void print_queue();
+
+void choose_queue(int order, int motor_dir);
 
