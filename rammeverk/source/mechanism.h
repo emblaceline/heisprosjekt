@@ -9,6 +9,8 @@
 /**
 * @brief Checks if any order buttons are pressed, and turns on light and adds them to the order queue
 * if they are.
+*
+* @param lastFloor The last floor the elevator was registered at.
 */
 void mechanism_check_all_button(int lastFoor);
 
@@ -25,25 +27,41 @@ void mechanism_emergency();
 */
 void mechanism_turn_off_all_lights();
 
+/**
+* @brief Turns off all call-buttons on a given floor.
+*
+* @param order The order
+*/
 void mechanism_turn_off_light(int order);
 
 /**
-* @brief Checks if the floor we are on is the same as the wanted floor from the order.
+* @brief Checks if elevator floor signal is the same as the order.
 *
-* @param floor The floor of the order
+* @param order The order
 *
 * @return true if elevator is on correct floor, if not false.
 */
 _Bool mechanism_correct_floor(int order);
 
+
+/**
+* @brief Compares the order and the last floor the elevator was registered at to figure
+* out wanted direction on the motor.
+*
+* @param order The order
+*
+* @param lastFloor The last floor the elevator was registered at.
+*
+* @return -1 if @p order is under @p lastFloor, 0 if they are the same, 1 if @p order is over @p lastFloor.
+*/
 int mechanism_compare(int order, int lastFloor);
 
 /**
-* @brief Turns off call-up, call-down and command button on a floor.
+* @brief Checks what the next order is and drives there. Calls @p door_open_door(), @p queue_remove_element(order)
+* and mechanism_turn_off_light(order) when the elevator reaches the correct floor.
 *
-* @param order Which floor to turn off the lights on.
+* @param lastFloor The last floor the elevator was registered at.
 */
-
 void mechanism_drive(int lastFloor);
 
 #endif // #ifndef __INCLUDE_MECHANISM_H__

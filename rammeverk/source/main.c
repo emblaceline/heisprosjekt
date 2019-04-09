@@ -1,3 +1,8 @@
+/**
+* @file
+* @brief The main file of the application
+*/
+
 #include "elev.h"
 #include "mechanism.h"
 #include "door.h"

@@ -1,3 +1,8 @@
+/**
+* @file
+* @brief Implementation file for the most basic get and set functions of the elevator
+*/
+
 // Wrapper for libComedi Elevator control.
 // These functions provides an interface to the elevators in the real time lab
 //

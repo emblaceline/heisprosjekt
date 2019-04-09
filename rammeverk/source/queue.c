@@ -1,3 +1,8 @@
+/**
+* @file
+* @brief Implementation file for handeling the queues of orders
+*/
+
 #include "queue.h"
 #include <stdio.h>
 #include "elev.h"
@@ -54,8 +59,8 @@ void queue_choose(int order, int motorDir){
 }
 
 
-void queue_remove_element(int floor){
-	up_queue[floor]=down_queue[floor]=0;
+void queue_remove_element(int order){
+	up_queue[order]=down_queue[order]=0;
 }
 
 void queue_remove_all_orders(){
@@ -73,7 +78,8 @@ int queue_empty(){
 	return 1;
 }
 
-int queue_get_next_order_up(int lastFloor){
+
+int queue_get_next_order_up(){
 	if(queue_empty()==1){
 		return -2;
 	}
@@ -99,7 +105,7 @@ int queue_get_next_order_up(int lastFloor){
 	return -2;
 }
 
-int queue_get_next_order_down(int lastFloor){
+int queue_get_next_order_down(){
 	if(queue_empty()==1){
 		return -2;
 	}
@@ -125,7 +131,6 @@ int queue_get_next_order_down(int lastFloor){
 	}
 	return -2;
 }
-
 
 
 void print_queue(){ 

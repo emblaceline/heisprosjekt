@@ -1,3 +1,8 @@
+/**
+* @file
+* @brief Implementation file for controlling the door
+*/
+
 #include "elev.h"
 #include "door.h"
 #include <time.h>

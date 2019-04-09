@@ -1,3 +1,8 @@
+/**
+* @file
+* @brief Implementation file for most of the mechanisms of the elevator
+*/
+
 #include "mechanism.h"
 #include "elev.h"
 #include "queue.h"
@@ -86,27 +91,39 @@ int mechanism_compare(int order, int lastFloor){
 }
 
 
-void mechanism_drive(int lastFloor){
+void mechanism_drive(int lastFloor){ // den synes opp-knapp i 1.,2. og 3. er viktigere enn command i 4. og ned-knapp i 2.,3.,4. er viktigere enn command i 1.
 	int order = -2;
 	print_queue();
+	
 	if(motorDir==0){
-		order=queue_get_next_order_up(lastFloor);
+		order=queue_get_next_order_up();
 		if(order==-2){
-			order=queue_get_next_order_down(lastFloor);
+			order=queue_get_next_order_down();
 		}
 	}
 	else if(motorDir==1){ 
-		order=queue_get_next_order_up(lastFloor);
+		order=queue_get_next_order_up();
 		if(order==-2){
-			order=queue_get_next_order_down(lastFloor);
+			order=queue_get_next_order_down();
+		}
+		if(order < lastFloor && queue_get_next_order_down()!=-2){
+
+			order=queue_get_next_order_down();
 		}
 	}
 	else{ 
-		order=queue_get_next_order_down(lastFloor);
+		order=queue_get_next_order_down();
 		if(order==-2){
-			order=queue_get_next_order_up(lastFloor);
+			order=queue_get_next_order_up();
+		}
+		if(order > lastFloor && queue_get_next_order_up()!=-2){
+			
+			order=queue_get_next_order_up();
 		}
 	}
+	
+
+	//order=queue_get_next_order(lastFloor);
 
 	if(order!=-2 && door_get_door_open()==0){
         motorDir = mechanism_compare(order,lastFloor);

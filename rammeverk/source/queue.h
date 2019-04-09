@@ -11,7 +11,6 @@
 *
 * @param order What floor the order is at.
 *
-*
 * @param[in] lastFloor The last floor the elevator was registered at.
 *
 * @param[in] motorDir The direction of the elevator.
@@ -19,28 +18,43 @@
 void queue_set(int order, int lastFloor, int motorDir);
 
 /**
-* @brief Puts an order on the correct floor for a up-button.
+* @brief Puts a order from a call-up-button in the call-up queue. If @p order is the same as
+* @p lastFloor, puts the order in the call-down queue.
 *
 * @param order The floor of the order.
+*
+* @param lastFloor The last floor the elevator was registered at.
 */
 void queue_set_up_queue(int order, int lastFloor);
 
 
 /**
-* @brief Puts an order on the correct floor for a down-button.
+* @brief Puts a order from a call-down-button in the call-down queue. If @p order is the same as
+* @p lastFloor, puts the order in the call-up queue.
 *
 * @param order The floor of the order.
+*
+* @param lastFloor The last floor the elevator was registered at.
 */
 void queue_set_down_queue(int order, int lastFloor);
 
+
+/**
+* @brief Chooses which queue to put a command-button order in when @p lastFloor is the same as 
+* @p order.
+*
+* @param order The floor of the order.
+*
+* @param motorDir what direction the elevator is driving.
+*/
 void queue_choose(int order, int motorDir);
 
 /**
 * @brief Removes an order from queue.
 *
-* @param floor The floor of the order.
+* @param order The floor of the order.
 */
-void queue_remove_element(int floor);
+void queue_remove_element(int order);
 
 /**
 * @brief Removes all orders in queue.
@@ -54,16 +68,20 @@ void queue_remove_all_orders();
 */
 int queue_empty();
 
-int queue_get_next_order_up(int lastFloor);
-
 /**
-* @brief Gets the floor of the next order.
-*
-* @param lastFloor The floor the elevator was last registered at.
+* @brief Gets the floor of the next order from call-up queue.
 *
 * @return Returns the floor of the next order. Returns -2 if there are no orders.
 */
-int queue_get_next_order_down(int lastFloor);
+
+int queue_get_next_order_up();
+
+/**
+* @brief Gets the floor of the next order call-down queue.
+*
+* @return Returns the floor of the next order. Returns -2 if there are no orders.
+*/
+int queue_get_next_order_down();
 
 
 void print_queue();
