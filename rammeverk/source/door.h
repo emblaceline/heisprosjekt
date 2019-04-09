@@ -3,11 +3,21 @@
 * @brief Library for handeling the door and timer
 */
 
+#ifndef __INCLUDE_DOOR_H__
+#define __INCLUDE_DOOR_H__
+
 typedef int bool;
 #define true 1;
 #define false 0;
 
 #define WAIT_TIME 3
+
+/**
+* @brief Checks if door is open.
+*
+* @return True if door is open, false if not.
+*/
+_Bool door_get_door_open();
 
 
 /**
@@ -43,4 +53,5 @@ int door_set_timer(int waitTime);
 */
 int door_check_time(int doorStatus);
 
-_Bool door_get_door_open();
+
+#endif // #ifndef __INCLUDE_DOOR_H__

@@ -6,6 +6,10 @@
 bool doorIsOpen;
 int doorStatus = 0; 
 
+_Bool door_get_door_open(){
+	return doorIsOpen;
+}
+
 void door_open_door() {
 	doorStatus = door_set_timer(WAIT_TIME);
 	elev_set_door_open_lamp(1);
@@ -33,6 +37,3 @@ int door_check_time(int doorStatus) {
 	return 0;
 }
 
-_Bool door_get_door_open(){
-	return doorIsOpen;
-}
