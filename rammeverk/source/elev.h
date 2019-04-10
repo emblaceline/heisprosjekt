@@ -1,7 +1,3 @@
-/**
-* @file
-* @brief Library for the most basic function to check or set signals from og to the elevator
-*/
 // Wrapper for libComedi Elevator control.
 // These functions provides an interface to the elevators in the real time lab
 //

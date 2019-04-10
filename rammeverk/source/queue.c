@@ -1,153 +1,170 @@
-/**
-* @file
-* @brief Implementation file for handeling the queues of orders
-*/
-
+#include "elev.h"
 #include "queue.h"
 #include <stdio.h>
-#include "elev.h"
-#include "door.h"
 
-static int up_queue[4]={0};
-static int down_queue[4]={0}; 
 
-void queue_set(int order, int lastFloor, int motorDir){
-	elev_set_button_lamp(BUTTON_COMMAND, order,1);
-	if (order==lastFloor) {
-		if (elev_get_floor_sensor_signal()==order && motorDir==0){ 
-			door_open_door();
-			elev_set_button_lamp(BUTTON_COMMAND,order,0);
-		}
-		else{
-			queue_choose(order,motorDir);
-		}
+static int arr_opp[N_FLOORS]; 
+static int arr_ned[N_FLOORS]; 
+static int arr_destination[N_FLOORS];
+elev_motor_direction_t direction;
+// int floor;
 
-	}
-	else if (order>=lastFloor){
-		up_queue[order]=1;
-	}
-	else if (order<=lastFloor){
-		down_queue[order]=1;
-	}
+
+
+void init_arrays(){
+    int i;
+    for (i =0; i < N_FLOORS;i++){
+        arr_destination[i] = 0;
+        arr_ned[i] = 0;
+        arr_opp[i] = 0;
+    }
 }
 
-void queue_set_up_queue(int order, int lastFloor){
-	if(lastFloor==order){
-		down_queue[order]=1;
-	}
-	else{
-		up_queue[order]=1;
-	}
+int check_orders(){
+    for(int i = 0; i < N_FLOORS; i++){
+        if(arr_destination[i]) return 1;
+        if(arr_ned[i]) return 1;
+        if(arr_opp[i]) return 1;
+    }
+    return 0;
 }
 
-void queue_set_down_queue(int order, int lastFloor){
-	if(lastFloor==order){
-		up_queue[order]=1;
-	}
-	else{
-		down_queue[order]=1;
-	}
-}
-
-void queue_choose(int order, int motorDir){
-	if (motorDir==1){
-		down_queue[order]=1;
-	}
-	else {
-		up_queue[order]=1;
-	}
-}
-
-
-void queue_remove_element(int order){
-	up_queue[order]=down_queue[order]=0;
-}
-
-void queue_remove_all_orders(){
-	for(int floor = 0; floor<N_FLOORS; floor++){  
-		queue_remove_element(floor);
-	}
-}
-
-int queue_empty(){
-	for(int i = 0; i<N_FLOORS; i++){
-		if((up_queue[i]||down_queue[i])==1){
-			return 0;
-		}
-	}
-	return 1;
-}
-
-
-int queue_get_next_order_up(){
-	if(queue_empty()==1){
-		return -2;
-	}
-	else{
-		/*for (int i = lastFloor; i < N_FLOORS; i++){
-			if(up_queue[i]==1){
-				return i;
-			}
-		}
-		for (int i = lastFloor; i >= 0; i--)
-		{
-			if(up_queue[i]==1){
-				return i;
-			}
-		}*/
-		for (int i=0; i<N_FLOORS; i++)
-		{
-			if(up_queue[i]==1){
-				return i;
-			}
-		}
-	}
-	return -2;
-}
-
-int queue_get_next_order_down(){
-	if(queue_empty()==1){
-		return -2;
-	}
-	else{
-		/*
-		for (int i = lastFloor; i >= 0; i--){
-			if(down_queue[i]==1){
-				return i;
-			}
-		}
-		for (int i = lastFloor; i < N_FLOORS; i++)
-		{
-			if(down_queue[i]==1){
-				return i;
-			}
-		}*/
-		for (int i=N_FLOORS-1; i>=0; i--)
-		{
-			if(down_queue[i]==1){
-				return i;
-			}
-		}
-	}
-	return -2;
+int check_queue(){
+    int i;
+    for (i=0; i < N_FLOORS; i++){
+        if (i == 0){
+            if(elev_get_button_signal(BUTTON_CALL_UP,i)){
+                elev_set_button_lamp(BUTTON_CALL_UP,i,1);
+                arr_opp[i] = 1;         
+                return 1;
+            }
+            if(elev_get_button_signal(BUTTON_COMMAND,i)){
+                elev_set_button_lamp(BUTTON_COMMAND,i,1);
+                arr_destination[i] = 1;
+                return 1;
+                }
+            }
+        if (i == 3){
+            if(elev_get_button_signal(BUTTON_CALL_DOWN,i)){
+                elev_set_button_lamp(BUTTON_CALL_DOWN,i,1);
+                arr_ned[i] = 1;
+                return 1;
+            }
+            if(elev_get_button_signal(BUTTON_COMMAND,i)){
+                elev_set_button_lamp(BUTTON_COMMAND,i,1);
+                arr_destination[i] = 1;
+                return 1;
+            }
+        } else{
+            if(elev_get_button_signal(BUTTON_CALL_UP,i)){
+                elev_set_button_lamp(BUTTON_CALL_UP,i,1);
+                arr_opp[i] = 1;         
+                return 1;
+                }
+            if(elev_get_button_signal(BUTTON_CALL_DOWN,i)){
+                elev_set_button_lamp(BUTTON_CALL_DOWN,i,1);
+                arr_ned[i] = 1;
+                return 1;
+            }
+            if(elev_get_button_signal(BUTTON_COMMAND,i)){
+                elev_set_button_lamp(BUTTON_COMMAND,i,1);
+                arr_destination[i] = 1;
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 
-void print_queue(){ 
-	printf("UP: ");
-	for (int i = 0; i < 4; ++i)
-	{
-		printf("%i", up_queue[i]);
-		if(i==3){
-			printf(" \n");
-		}
-	}
-	printf("DOWN: ");
-	for (int i = 0; i < 4; ++i)
-	{
-		printf("%i", down_queue[i]);
-		if(i==3){
-			printf(" \n");
-		}
-	}
+int check_queue_floor(int floor){
+    if (floor == -1){return 0;}
+    if (arr_opp[floor]){
+        return 1;
+    }
+    if (arr_ned[floor]){
+        return 1;
+    }
+    if (arr_destination[floor]){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+
+void delete_floor_order(int floor){
+    elev_set_button_lamp(BUTTON_CALL_UP,floor,0);
+    elev_set_button_lamp(BUTTON_CALL_DOWN,floor,0);
+    elev_set_button_lamp(BUTTON_COMMAND,floor,0);
+    arr_opp[floor] = 0;
+    arr_ned[floor] = 0;
+    arr_destination[floor] = 0;
+
+}
+
+void delete_all_orders(){
+    int i;
+    for (i = 0; i < N_FLOORS;i++){
+        delete_floor_order(i);
+    }
+}
+
+
+int order_above(int floor){
+    int i;
+    for (i=floor; i < N_FLOORS; i++){
+        if (arr_destination[i]){return 1;} 
+        if (arr_ned[i]){return 1;} 
+        if (arr_opp[i]){return 1;}    
+        }
+    return 0;
+}
+
+
+int order_below(int floor){
+    for (int i = 0; i < floor+1; i++){
+        if (arr_destination[i]){return 1;} 
+        if (arr_ned[i]){return 1;} 
+        if (arr_opp[i]){return 1;}    
+    }
+    return 0;
+}
+
+int order_floor_direction_down(int floor){
+    if (arr_destination[floor]){return 1;} 
+    if (arr_ned[floor]){return 1;} 
+    return 0;
+}
+
+int order_floor_direction_up(int floor){
+    if (arr_destination[floor]){return 1;} 
+    if (arr_opp[floor]){return 1;} 
+    return 0;
+}
+
+/*
+elev_motor_direction_t get_dir(int floor){
+    if (direction == DIRN_DOWN && order_below_and_down()) return DIRN_DOWN;
+    if (direction == DIRN_UP && order_above_and_up()) return DIRN_UP;
+    if (direction == DIRN_DOWN && 
+
+}
+*/
+elev_motor_direction_t get_direction(int floor){
+    if ( order_above(floor) && direction == DIRN_UP){return DIRN_UP;}
+    else if (order_below(floor) && direction == DIRN_DOWN){return DIRN_DOWN;}
+    else if (order_above(floor)){return DIRN_UP;}
+    else if (order_below(floor)){return DIRN_DOWN;}
+    else if (floor == -1){
+        printf("Unable to find floor, will continue in last known direction");
+        return direction;
+        }
+    else{
+        printf("Get_direction has no action,\n");
+         printf("order above: %d\n",(order_above(floor)));
+         printf("order below: %d\n",(order_below(floor)));
+        return direction;
+    }
 }

@@ -1,8 +1,3 @@
-/**
-* @file
-* @brief Library over the adresses of the different buttons and lights and the motor
-*/
-
 // Channel definitions for elevator control using LibComedi
 //
 // 2006, Martin Korsgaard
