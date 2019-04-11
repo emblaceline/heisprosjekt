@@ -57,8 +57,8 @@ _Bool mechanism_correct_floor(int order);
 int mechanism_compare(int order, int lastFloor);
 
 /**
-* @brief Checks what the next order is and drives there. Calls @p door_open_door(), @p queue_remove_element(order)
-* and mechanism_turn_off_light(order) when the elevator reaches the correct floor.
+* @brief Checks what the next order is and drives there. Calls @p door_open_door(), @p queue_remove_element(int order)
+* and @p mechanism_turn_off_light(int order) when the elevator reaches the correct floor.
 *
 * @param lastFloor The last floor the elevator was registered at.
 */

@@ -10,6 +10,8 @@
 #include "door.h"
 
 int motorDir = 0;
+int emergencyWasPressed=0;
+int emergencyDir=0;
 
 void mechanism_check_all_button(int lastFloor){
 	for (int floor=0; floor<N_FLOORS; floor++) {
@@ -33,7 +35,8 @@ void mechanism_check_all_button(int lastFloor){
 	}
 }
 
-void mechanism_emergency(){  
+void mechanism_emergency(){ 
+	emergencyWasPressed=1; 
 	elev_set_motor_direction(DIRN_STOP);
 	elev_set_stop_lamp(1);
 	mechanism_turn_off_all_lights();
@@ -44,6 +47,8 @@ void mechanism_emergency(){
 		}
 	}
 	elev_set_stop_lamp(0);
+	
+
 }
 
 
@@ -55,12 +60,11 @@ void mechanism_turn_off_all_lights(){
 	for(int floor = 0; floor < N_FLOORS-1; floor++){
 		elev_set_button_lamp(BUTTON_CALL_UP,floor,0);
 		elev_set_button_lamp(BUTTON_CALL_DOWN,floor+1,0);
-
 	}
 
 }
 
-void mechanism_turn_off_light(order){
+void mechanism_turn_off_light(int order){
 	elev_set_button_lamp(BUTTON_COMMAND, order, 0);
 	if (order<3){
 		elev_set_button_lamp(BUTTON_CALL_UP, order, 0);
@@ -91,65 +95,74 @@ int mechanism_compare(int order, int lastFloor){
 }
 
 
-void mechanism_drive(int lastFloor){ // den synes opp-knapp i 1.,2. og 3. er viktigere enn command i 4. og ned-knapp i 2.,3.,4. er viktigere enn command i 1.
+void mechanism_drive(int lastFloor){ 
 	int order = -2;
-	print_queue();
-	
+
+	//print_queue();
 	if(motorDir==0){
-		order=queue_get_next_order_up();
+		order=queue_get_next_order_up(lastFloor);
 		if(order==-2){
-			order=queue_get_next_order_down();
+			order=queue_get_next_order_down(lastFloor);
 		}
 	}
 	else if(motorDir==1){ 
-		order=queue_get_next_order_up();
+		order=queue_get_next_order_up(lastFloor);
 		if(order==-2){
-			order=queue_get_next_order_down();
+			order=queue_get_next_order_down(lastFloor);	
 		}
-		if(order < lastFloor && queue_get_next_order_down()!=-2){
 
-			order=queue_get_next_order_down();
+		else if(order < lastFloor && queue_get_next_order_down(lastFloor)!=-2){
+			order=queue_get_next_order_down(lastFloor);
 		}
+
+
+		/*if(order==lastFloor && elev_get_floor_sensor_signal()==-1 && emergencyWasPressed == 0){
+			order=queue_get_next_order_over(lastFloor);
+		}*/
 	}
 	else{ 
-		order=queue_get_next_order_down();
+		order=queue_get_next_order_down(lastFloor);
 		if(order==-2){
-			order=queue_get_next_order_up();
+			order=queue_get_next_order_up(lastFloor);
 		}
-		if(order > lastFloor && queue_get_next_order_up()!=-2){
-			
-			order=queue_get_next_order_up();
+
+		else if(order > lastFloor && queue_get_next_order_up(lastFloor)!=-2){
+			order=queue_get_next_order_up(lastFloor);
+		}
+
+		/*
+		if(order==lastFloor && elev_get_floor_sensor_signal()==-1 && emergencyWasPressed==0){
+			order=queue_get_next_order_under(lastFloor);
+		}*/
+	}
+	//order=mechanism_get_order(motorDir, lastFloor);
+
+	if(emergencyWasPressed==1){
+		if(order!=-2){
+			emergencyWasPressed=0;
+			if(order==lastFloor){
+				emergencyDir=motorDir;
+			}
 		}
 	}
 	
-
-	//order=queue_get_next_order(lastFloor);
-
 	if(order!=-2 && door_get_door_open()==0){
-        motorDir = mechanism_compare(order,lastFloor);
-       	elev_set_motor_direction(motorDir);
-
-        if(order==lastFloor){
-        	door_open_door();
-        	queue_remove_element(order);
-        	mechanism_turn_off_light(order);
-        }
-
+       	if(emergencyDir!=0){
+       		elev_set_motor_direction(-(emergencyDir));
+       		if(elev_get_floor_sensor_signal()==order){
+       			emergencyDir=0;
+       		}
+       	}
+       	else{
+       		motorDir = mechanism_compare(order,lastFloor);
+       		elev_set_motor_direction(motorDir);
+  
+       		if(order==lastFloor && elev_get_floor_sensor_signal()!=-1){  
+        		door_open_door();
+        		queue_remove_element(order);
+        		mechanism_turn_off_light(order);
+        	}
+       	}
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

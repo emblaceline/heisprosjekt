@@ -1,145 +1,80 @@
+/**
+* @file
+* @brief The main file of the application
+*/
+
 #include "elev.h"
-#include "fsm.h"
-#include "timer.h"
+#include "mechanism.h"
+#include "door.h"
 #include "queue.h"
-#include <time.h>
 #include <stdio.h>
 
+void start_up();
+
+int lastFloor;
 
 int main() {
     // Initialize hardware
-
     if (!elev_init()) {
         printf("Unable to initialize elevator hardware!\n");
         return 1;
     }
 
-    //initializes the elevator
-    FSM_init();
-    init_arrays();
-    State state = IDLE;
-    //variables declared before while-loop
-    int current_floor;
-    int last_floor;
-  
+    printf("Press STOP button to stop elevator and exit program.\n");
 
-    while (1) {
-        //updates current_floor continousley
-        current_floor = elev_get_floor_sensor_signal();
-        //updates queue continuosely
-        check_queue();
-        switch (state){
 
-            case IDLE:
-                //checks if there are any orders
-                if (check_orders()){
-                    //checks if order is in current floor
-                    if(check_queue_floor(current_floor)){
-                        state = DOORS_OPEN;
-                    }else{
-                        //finds out which direction to drive in
-                        direction = get_direction(current_floor);
-                        elev_set_motor_direction(direction);
-                        last_floor = current_floor;
-                        state = DRIVE;
-                    }
-                }
-                break;
-
-            case DRIVE:
-                if(elev_get_floor_sensor_signal() !=-1){
-                    elev_set_floor_indicator(current_floor);
-                }
-            
-                
-                if (check_queue_floor(current_floor)){
-                    
-                    if((direction == DIRN_DOWN && order_floor_direction_down(current_floor ) )|| ( direction == DIRN_DOWN && current_floor == 0)){
-                        elev_set_motor_direction(DIRN_STOP);
-                        state = DOORS_OPEN;
-                    }
-                    else if((direction == DIRN_UP && order_floor_direction_up(current_floor) )|| ( direction == DIRN_UP && current_floor == 3)){
-                        elev_set_motor_direction(DIRN_STOP);
-                        state = DOORS_OPEN;
-                    } 
-                    
-                    /*
-                    elev_set_motor_direction(DIRN_STOP);
-                    state = DOORS_OPEN;*/
-                }
-                break;
-
-            case DOORS_OPEN:
-                if(current_floor == -1){
-                    FSM_init();
-                }
-                if(!is_timer_on()){
-                    //turns on timer if it is not already on
-                    timer_start();
-                }
-                delete_floor_order(current_floor); //FIKS HER  FIKS HER    FIKS HER            FIKS HER        FIKS HER
-                //turns on doorlamp
-                elev_set_door_open_lamp(1);
-                //checks if timer has exceeded three seconds
-                if(timer_three_seconds()){
-                    //turns off doorlamp and timer
-                    elev_set_door_open_lamp(0);
-                    turn_off_timer();
-                    //checks if there are any more orders
-                    if(check_orders()){
-                        last_floor = current_floor;
-                        //finds out which direction to drive in
-                        direction = get_direction(current_floor);
-                        elev_set_motor_direction(direction);
-                        state = DRIVE;
-                    }else{
-                        //Idle
-                        state = IDLE;
-                }}
-                break;
-
-            case EMERGENCY_STOP:
-                elev_set_motor_direction(DIRN_STOP);
-                delete_all_orders();
-                while(elev_get_stop_signal()){
-                    elev_set_stop_lamp(1);
-                    if (current_floor != -1){
-                        elev_set_door_open_lamp(1);
-                    }
-                }
-                elev_set_stop_lamp(0);
-                if(current_floor != -1){
-                    if(!is_timer_on()){
-                    timer_start();
-                    }
-                    delete_floor_order(current_floor);
-                    //turns on doorlamp
-                    elev_set_door_open_lamp(1);
-                    //checks if timer has exceeded three seconds
-                    if(timer_three_seconds()){
-                        //turns off doorlamp and timer
-                        elev_set_door_open_lamp(0);
-                        turn_off_timer();
-                        state = IDLE;
-                }
-                }else{
-                    elev_set_motor_direction(direction);
-                    while(elev_get_floor_sensor_signal()==-1 && !elev_get_stop_signal()){
-                    };
-                    if(elev_get_stop_signal()){
-                        state = EMERGENCY_STOP;
-                    }else{
-                        elev_set_floor_indicator(elev_get_floor_sensor_signal());
-                        elev_set_motor_direction(DIRN_STOP);
-                        state = IDLE;
-                    }
-                }
-                break;
-
+    start_up();
+    printf("been here\n");
+    //int floor = N_FLOORS; 
+    
+    while(1){
+        if(elev_get_floor_sensor_signal() != -1){ 
+            lastFloor = elev_get_floor_sensor_signal();
         }
-        if (elev_get_stop_signal()){
-            state = EMERGENCY_STOP;
+        while(elev_get_stop_signal()==0){
+
+            if(elev_get_floor_sensor_signal() >= 0){ 
+                lastFloor = elev_get_floor_sensor_signal();
+                if (lastFloor!=-1)
+                    elev_set_floor_indicator(lastFloor);
+            }
+            mechanism_check_all_button(lastFloor);
+            mechanism_drive(lastFloor);
+            if(elev_get_stop_signal()){
+                elev_set_motor_direction(DIRN_STOP);
+                break;
+            }   
+            /*
+            if (mechanism_correct_floor(floor) && (!door_get_door_open())){ 
+                elev_set_motor_direction(DIRN_STOP);
+                door_open_door();
+            }*/
+            
+
+            if(door_get_door_open()){
+                door_close_door();
+            }
+        }
+        mechanism_emergency();
+        queue_remove_all_orders();     
+    }
+    
+    return 0;
+}
+
+void start_up() {
+    bool driving = false;
+
+    if(elev_get_floor_sensor_signal() == -1){
+        elev_set_motor_direction(DIRN_DOWN);
+        driving = true;
+        while(driving){
+            if(elev_get_floor_sensor_signal() >= 0){
+                elev_set_motor_direction(DIRN_STOP);
+                driving=false;
+            }
         }
     }
-    return 0;
+    elev_set_floor_indicator(elev_get_floor_sensor_signal());
+    lastFloor = elev_get_floor_sensor_signal();
 }
