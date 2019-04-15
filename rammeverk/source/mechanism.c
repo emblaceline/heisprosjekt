@@ -11,25 +11,27 @@
 
 int motorDir = 0;
 int emergencyWasPressed=0;
+//last direction of the motor before emergency
 int emergencyDir=0;
 
-void mechanism_check_all_button(int lastFloor){
+void mechanism_check_all_buttons(int lastFloor){
 	for (int floor=0; floor<N_FLOORS; floor++) {
 		if (elev_get_button_signal(BUTTON_COMMAND,floor)) {
-			queue_set(floor, lastFloor, motorDir);
+			//queue_set_command_queue(floor, lastFloor, motorDir);
+			queue_set_queue(floor, lastFloor, motorDir, 2);
 		}
 
 		if (floor!=N_FLOORS-1) {
-
 			if (elev_get_button_signal(BUTTON_CALL_UP, floor)==1){
-				queue_set_up_queue(floor,lastFloor);
-				elev_set_button_lamp(BUTTON_CALL_UP, floor, 1);
+				//queue_set_up_queue(floor, lastFloor, motorDir);
+				queue_set_queue(floor, lastFloor, motorDir, 0);
 			}
 		}
+		
 		if (floor != 0) {
 			if (elev_get_button_signal(BUTTON_CALL_DOWN, floor)==1){
-				queue_set_down_queue(floor,lastFloor);
-				elev_set_button_lamp(BUTTON_CALL_DOWN, floor, 1);
+				//queue_set_down_queue(floor, lastFloor, motorDir);
+				queue_set_queue(floor, lastFloor, motorDir, 1);
 			}
 		}
 	}
@@ -97,58 +99,25 @@ int mechanism_compare(int order, int lastFloor){
 
 void mechanism_drive(int lastFloor){ 
 	int order = -2;
-
-	//print_queue();
-	if(motorDir==0){
-		order=queue_get_next_order_up(lastFloor);
-		if(order==-2){
-			order=queue_get_next_order_down(lastFloor);
-		}
-	}
-	else if(motorDir==1){ 
-		order=queue_get_next_order_up(lastFloor);
-		if(order==-2){
-			order=queue_get_next_order_down(lastFloor);	
-		}
-
-		else if(order < lastFloor && queue_get_next_order_down(lastFloor)!=-2){
-			order=queue_get_next_order_down(lastFloor);
-		}
-
-
-		/*if(order==lastFloor && elev_get_floor_sensor_signal()==-1 && emergencyWasPressed == 0){
-			order=queue_get_next_order_over(lastFloor);
-		}*/
-	}
-	else{ 
-		order=queue_get_next_order_down(lastFloor);
-		if(order==-2){
-			order=queue_get_next_order_up(lastFloor);
-		}
-
-		else if(order > lastFloor && queue_get_next_order_up(lastFloor)!=-2){
-			order=queue_get_next_order_up(lastFloor);
-		}
-
-		/*
-		if(order==lastFloor && elev_get_floor_sensor_signal()==-1 && emergencyWasPressed==0){
-			order=queue_get_next_order_under(lastFloor);
-		}*/
-	}
-	//order=mechanism_get_order(motorDir, lastFloor);
+	print_queue();
 
 	if(emergencyWasPressed==1){
+		order=queue_get_next_order(lastFloor, 0);
 		if(order!=-2){
 			emergencyWasPressed=0;
 			if(order==lastFloor){
-				emergencyDir=motorDir;
+				emergencyDir=-motorDir;
 			}
 		}
+	}
+
+	else{
+		order=queue_get_next_order(lastFloor, motorDir);
 	}
 	
 	if(order!=-2 && door_get_door_open()==0){
        	if(emergencyDir!=0){
-       		elev_set_motor_direction(-(emergencyDir));
+       		elev_set_motor_direction(emergencyDir);
        		if(elev_get_floor_sensor_signal()==order){
        			emergencyDir=0;
        		}
@@ -165,4 +134,5 @@ void mechanism_drive(int lastFloor){
        	}
     }
 }
+
 

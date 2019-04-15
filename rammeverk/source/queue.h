@@ -6,53 +6,87 @@
 #ifndef __INCLUDE_QUEUE_H__
 #define __INCLUDE_QUEUE_H__
 
+void queue_set_queue(int order, int lastFloor, int motorDir, int type);
+
 /**
-* @brief Puts the orders from the command-buttons into queue
+* @brief Puts the orders from the command buttons into command-queue and turns on command button light.
+* If elevator is on the floor of the order it will open the door.
 *
-* @param order What floor the order is at.
+* @param[in] order What floor the order is at.
 *
 * @param[in] lastFloor The last floor the elevator was registered at.
 *
-* @param[in] motorDir The direction of the elevator.
+* @param [in] motorDir The direction the elevator is moving.
 */
-void queue_set(int order, int lastFloor, int motorDir);
+void queue_set_command_queue(int order, int lastFloor, int motorDir);
 
 /**
-* @brief Puts a order from a call-up-button in the call-up queue. If @p order is the same as
-* @p lastFloor, puts the order in the call-down queue.
+* @brief Puts the orders from the call-up buttons into up-queue and turns on call-up button light.
+* If elevator is on the floor of the order it will open the door.
 *
-* @param order The floor of the order.
+* @param[in] order What floor the order is at.
 *
-* @param lastFloor The last floor the elevator was registered at.
+* @param[in] lastFloor The last floor the elevator was registered at.
+*
+* @param [in] motorDir The direction the elevator is moving.
 */
-void queue_set_up_queue(int order, int lastFloor);
-
-
-/**
-* @brief Puts a order from a call-down-button in the call-down queue. If @p order is the same as
-* @p lastFloor, puts the order in the call-up queue.
-*
-* @param order The floor of the order.
-*
-* @param lastFloor The last floor the elevator was registered at.
-*/
-void queue_set_down_queue(int order, int lastFloor);
+void queue_set_up_queue(int order, int lastFloor, int motorDir);
 
 
 /**
-* @brief Chooses which queue to put a command-button order in when @p lastFloor is the same as 
-* @p order.
+* @brief Puts the orders from the call-down buttons into down-queue and turns on call-down button light.
+* If elevator is on the floor of the order it will open the door.
 *
-* @param order The floor of the order.
+* @param[in] order What floor the order is at.
 *
-* @param motorDir what direction the elevator is driving.
+* @param[in] lastFloor The last floor the elevator was registered at.
+*
+* @param [in] motorDir The direction the elevator is moving.
 */
-void queue_choose(int order, int motorDir);
+void queue_set_down_queue(int order, int lastFloor, int motorDir);
+
+/**
+* @brief Gets the next order.
+*
+* @param[in] lastFloor The last floor the elevator was registered at.
+*
+* @param [in] motorDir The direction the elevator is moving.
+*
+* @return The floor of the next order. -2 if there are no orders.
+*/
+int queue_get_next_order(int lastFloor, int motorDir);
+
+/**
+* @brief Gets the next order when the elevator is standing still.
+*
+* @param[in] lastFloor The last floor the elevator was registered at.
+*
+* @return The floor of the next order. -2 if there are no orders.
+*/
+int queue_get_next_order_stop(int lastFloor);
+
+/**
+* @brief Gets the next order when the elevator is moving up.
+*
+* @param[in] lastFloor The last floor the elevator was registered at.
+*
+* @return The floor of the next order. -2 if there are no orders.
+*/
+int queue_get_next_order_moving_up(int lastFloor);
+
+/**
+* @brief Gets the next order when the elevator is moving down.
+*
+* @param[in] lastFloor The last floor the elevator was registered at.
+*
+* @return The floor of the next order. -2 if there are no orders.
+*/
+int queue_get_next_order_moving_down(int lastFloor);
 
 /**
 * @brief Removes an order from queue.
 *
-* @param order The floor of the order.
+* @param[in] order The floor of the order.
 */
 void queue_remove_element(int order);
 
@@ -69,28 +103,21 @@ void queue_remove_all_orders();
 int queue_empty();
 
 /**
-* @brief Gets the floor of the next order from call-up queue.
+* @brief Checks if there are only call-up/down orders under/over the elevator in the opposite direction that the elevator is moving.
 *
-* @return Returns the floor of the next order. Returns -2 if there are no orders.
-*/
-
-int queue_get_next_order_up(int lastFloor);
-
-/**
-* @brief Gets the floor of the next order call-down queue.
+* @param[in] upOrDown 1 if the elevator is moving up, -1 if it is moving down
 *
-* @return Returns the floor of the next order. Returns -2 if there are no orders.
+* @param[in] lastFloor The last floor the elevator was registered at.
+*
+* @return If elevator is moving up: returns -2 if there are no orders over the elevator
+* or if call-up or command has order(s) over the elevator.
+* If neither of those: returns the floor of the call-down order over the elevator. <br>
+* If elevator is moving down: returns -2 if there are no orders under the elevator
+* or if call-down or command has order(s) under the elevator. 
+* If neither of those: returns the floor of the call-up order under the elevator.
 */
-int queue_get_next_order_down(int lastFloor);
-
-int queue_get_next_order_over(int lastFloor);
-
-int queue_get_next_order_under(int lastFloor);
-
-
+int queue_empty_in_dir(int upOrDown, int lastFloor);
 
 void print_queue();
-
-
 
 #endif // #ifndef __INCLUDE_QUEUE_H__
