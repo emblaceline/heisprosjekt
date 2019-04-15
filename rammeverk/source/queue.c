@@ -11,21 +11,22 @@
 static int up_queue[4]={0};
 static int down_queue[4]={0}; 
 static int command_queue[4]={0};
+
 //last direction of the motor
 int lastDir=1;
 int problemUp, problemDown=0;
 
-void queue_set_queue(int order, int lastFloor, int motorDir, int type){
-	elev_set_button_lamp(type, order,1);
+void queue_set_queue(int order, int lastFloor, int motorDir, int buttonType){
+	elev_set_button_lamp(buttonType, order,1);
 	if (order==lastFloor && elev_get_floor_sensor_signal()==order && motorDir==0) {
 		door_open_door();
-		elev_set_button_lamp(type,order,0);
+		elev_set_button_lamp(buttonType,order,0);
 	}
 	else{
-		if(type==0){
+		if(buttonType==0){
 			up_queue[order]=1;
 		}
-		else if(type==1){
+		else if(buttonType==1){
 			down_queue[order]=1;
 		}
 		else{

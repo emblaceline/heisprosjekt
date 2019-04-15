@@ -6,7 +6,20 @@
 #ifndef __INCLUDE_QUEUE_H__
 #define __INCLUDE_QUEUE_H__
 
-void queue_set_queue(int order, int lastFloor, int motorDir, int type);
+
+/**
+* @brief Puts the orders into queue and turns on the button light.
+* If elevator is on the floor of the order it will open the door.
+*
+* @param[in] order What floor the order is at.
+*
+* @param[in] lastFloor The last floor the elevator was registered at.
+*
+* @param[in] motorDir The direction the elevator is moving.
+*
+* @param[in] buttonType 0 if call-up button, 1 if call-down button, 2 if command button.
+*/
+void queue_set_queue(int order, int lastFloor, int motorDir, int buttonType);
 
 /**
 * @brief Puts the orders from the command buttons into command-queue and turns on command button light.
@@ -16,8 +29,9 @@ void queue_set_queue(int order, int lastFloor, int motorDir, int type);
 *
 * @param[in] lastFloor The last floor the elevator was registered at.
 *
-* @param [in] motorDir The direction the elevator is moving.
+* @param[in] motorDir The direction the elevator is moving.
 */
+
 void queue_set_command_queue(int order, int lastFloor, int motorDir);
 
 /**
@@ -28,7 +42,7 @@ void queue_set_command_queue(int order, int lastFloor, int motorDir);
 *
 * @param[in] lastFloor The last floor the elevator was registered at.
 *
-* @param [in] motorDir The direction the elevator is moving.
+* @param[in] motorDir The direction the elevator is moving.
 */
 void queue_set_up_queue(int order, int lastFloor, int motorDir);
 
@@ -41,7 +55,7 @@ void queue_set_up_queue(int order, int lastFloor, int motorDir);
 *
 * @param[in] lastFloor The last floor the elevator was registered at.
 *
-* @param [in] motorDir The direction the elevator is moving.
+* @param[in] motorDir The direction the elevator is moving.
 */
 void queue_set_down_queue(int order, int lastFloor, int motorDir);
 
